@@ -1,11 +1,11 @@
-name: Publish latest builds
+name: Publish packages
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g., 1.2.3)'
-        required: true
+        description: 'Release version or npm tag (e.g., 1.2.3, 1.2.3-rc.1, or canary)'
+        required: false
         type: string
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   publish:
-    name: Publish latest builds
+    name: Publish packages
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -29,41 +29,105 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate version input
+      - name: Determine release mode
+        id: release
+        env:
+          VERSION_INPUT: ${{ github.event.inputs.version || '' }}
         run: |
-          if ! [[ "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Version must be in semantic version format (e.g., 1.2.3)"
-            exit 1
+          input="$VERSION_INPUT"
+          timestamp=$(date -u +'%Y%m%d%H%M%S')
+          strict_version_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+          prerelease_regex='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)-([0-9A-Za-z-]+)\.([0-9]+)$'
+
+          if [[ "$input" =~ $strict_version_regex ]]; then
+            publish_tag='latest'
+            package_version="$input"
+            release_tag="v$input"
+            release_name="v$input"
+            prerelease='false'
+            mode='release'
+          elif [[ "$input" =~ $prerelease_regex ]]; then
+            publish_tag="${BASH_REMATCH[4]}"
+            package_version="$input"
+            release_tag="v$input"
+            release_name="v$input"
+            prerelease='true'
+            mode='prerelease'
+          else
+            publish_tag="${input:-dev}"
+            if [[ ! "$publish_tag" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+              echo "Invalid npm dist-tag: $publish_tag"
+              exit 1
+            fi
+
+            package_version=''
+            dev_suffix="-dev.$timestamp"
+            release_tag="dev-$timestamp"
+            release_name="Development build $timestamp"
+            prerelease='true'
+            mode='development'
+          fi
+
+          {
+            echo "publish_tag=$publish_tag"
+            echo "package_version=$package_version"
+            echo "release_tag=$release_tag"
+            echo "release_name=$release_name"
+            echo "prerelease=$prerelease"
+            echo "mode=$mode"
+            echo "dev_suffix=${dev_suffix:-}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Mode: $mode"
+          echo "NPM tag: $publish_tag"
+          if [ -n "$package_version" ]; then
+            echo "Package version: $package_version"
+          else
+            echo "Package version suffix: $dev_suffix"
           fi
 
       - name: Update package versions
+        env:
+          MODE: ${{ steps.release.outputs.mode }}
+          PACKAGE_VERSION: ${{ steps.release.outputs.package_version }}
+          DEV_SUFFIX: ${{ steps.release.outputs.dev_suffix }}
         run: |
-          target_version="${{ github.event.inputs.version }}"
-          echo "Setting version to: $target_version"
-
           for dir in packages/*; do
             [ -f "$dir/package.json" ] || continue
-            echo "Updating $dir/package.json..."
-            node -e "
-              const fs = require('fs');
-              const path = './$dir/package.json';
-              const pkg = require(path);
-              pkg.version = '$target_version';
-              fs.writeFileSync(path, JSON.stringify(pkg, null, 2));
-              console.log('Updated ' + pkg.name + ' to version ' + pkg.version);
-            "
+
+            if [ "$MODE" = 'development' ]; then
+              node -e '
+                const fs = require("fs");
+                const path = process.argv[1];
+                const suffix = process.argv[2];
+                const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
+                pkg.version += suffix;
+                fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
+                console.log(`Updated ${pkg.name} to ${pkg.version}`);
+              ' "$dir/package.json" "$DEV_SUFFIX"
+            else
+              node -e '
+                const fs = require("fs");
+                const path = process.argv[1];
+                const version = process.argv[2];
+                const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
+                pkg.version = version;
+                fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + "\n");
+                console.log(`Updated ${pkg.name} to ${pkg.version}`);
+              ' "$dir/package.json" "$PACKAGE_VERSION"
+            fi
           done
 
       - name: Build packages
         run: pnpm dlx turbo build --filter='./packages/*'
 
-      - name: Publish packages
+      - name: Publish packages with npm trusted publishing
+        env:
+          NPM_TAG: ${{ steps.release.outputs.publish_tag }}
         run: |
           PACKAGES=(
             "commandkit:packages/commandkit"
@@ -81,40 +145,38 @@ jobs:
 
           for entry in "${PACKAGES[@]}"; do
             IFS=":" read -r name path <<< "$entry"
-            echo "Publishing $name..."
-            
-            VERSION=$(node -p "require('./$path/package.json').version")
-            
-            if npm view "$name@$VERSION" version >/dev/null 2>&1; then
-              echo "📦 $name@$VERSION already exists on npm, skipping..."
+            version=$(node -p "require('./$path/package.json').version")
+            echo "Publishing $name@$version under '$NPM_TAG'..."
+
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "📦 $name@$version already exists on npm, skipping..."
+            elif (
+              cd "$path"
+              npm publish --provenance --access public --tag "$NPM_TAG"
+            ); then
+              echo "✅ Published $name@$version under '$NPM_TAG'"
+            elif npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "📦 $name@$version was published by another process, skipping..."
             else
-              if pnpm --filter="$name" publish --no-git-checks --access public; then
-                echo "✅ Published $name@$VERSION"
-              else
-                if npm view "$name@$VERSION" version >/dev/null 2>&1; then
-                  echo "📦 $name@$VERSION was published by another process, skipping..."
-                else
-                  echo "❌ Failed to publish $name@$VERSION"
-                  exit 1
-                fi
-              fi
+              echo "❌ Failed to publish $name@$version"
+              exit 1
             fi
           done
 
       - name: Generate changelog
-        id: changelog
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          NPM_TAG: ${{ steps.release.outputs.publish_tag }}
+          RELEASE_MODE: ${{ steps.release.outputs.mode }}
         run: |
-          VERSION="v${{ github.event.inputs.version }}"
+          previous_tag=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
 
-          # Find the previous version tag
-          PREV_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-
-          if [ -z "$PREV_TAG" ]; then
-            COMMIT_RANGE="HEAD"
-            echo "No previous tag found, using all commits"
+          if [ -z "$previous_tag" ]; then
+            commit_range='HEAD'
+            echo 'No previous stable tag found, using all commits'
           else
-            COMMIT_RANGE="${PREV_TAG}..HEAD"
-            echo "Generating changelog from $PREV_TAG to HEAD"
+            commit_range="$previous_tag..HEAD"
+            echo "Generating changelog from $previous_tag to HEAD"
           fi
 
           PACKAGES=(
@@ -131,74 +193,73 @@ jobs:
             "@commandkit/workflow:packages/workflow"
           )
 
-          CHANGELOG=""
+          changelog="## $RELEASE_TAG\n\n"
+          changelog+="Published under the npm \`$NPM_TAG\` tag in \`$RELEASE_MODE\` mode.\n"
 
           for entry in "${PACKAGES[@]}"; do
             IFS=":" read -r name path <<< "$entry"
+            commits=$(git log "$commit_range" --pretty=format:"%s|%h" -- "$path" 2>/dev/null || true)
+            [ -z "$commits" ] && continue
 
-            COMMITS=$(git log "$COMMIT_RANGE" --pretty=format:"%s|%h" -- "$path" 2>/dev/null || true)
+            features=''
+            fixes=''
+            chores=''
+            docs=''
+            refactors=''
+            performance=''
+            tests=''
+            others=''
 
-            [ -z "$COMMITS" ] && continue
-
-            FEATS=""
-            FIXES=""
-            CHORES=""
-            DOCS=""
-            REFACTORS=""
-            PERFS=""
-            TESTS=""
-            OTHERS=""
-
-            while IFS='|' read -r msg hash; do
-              line="- ${msg} (\`${hash}\`)"
-              case "$msg" in
-                feat:*|feat\(*) FEATS+=$'\n'"$line" ;;
-                fix:*|fix\(*) FIXES+=$'\n'"$line" ;;
-                chore:*|chore\(*) CHORES+=$'\n'"$line" ;;
-                docs:*|docs\(*) DOCS+=$'\n'"$line" ;;
-                refactor:*|refactor\(*) REFACTORS+=$'\n'"$line" ;;
-                perf:*|perf\(*) PERFS+=$'\n'"$line" ;;
-                test:*|test\(*|tests:*|tests\(*) TESTS+=$'\n'"$line" ;;
-                *) OTHERS+=$'\n'"$line" ;;
+            while IFS='|' read -r message hash; do
+              line="- ${message} (\`${hash}\`)"
+              case "$message" in
+                feat:*|feat\(*) features+=$'\n'"$line" ;;
+                fix:*|fix\(*) fixes+=$'\n'"$line" ;;
+                chore:*|chore\(*) chores+=$'\n'"$line" ;;
+                docs:*|docs\(*) docs+=$'\n'"$line" ;;
+                refactor:*|refactor\(*) refactors+=$'\n'"$line" ;;
+                perf:*|perf\(*) performance+=$'\n'"$line" ;;
+                test:*|test\(*|tests:*|tests\(*) tests+=$'\n'"$line" ;;
+                *) others+=$'\n'"$line" ;;
               esac
-            done <<< "$COMMITS"
+            done <<< "$commits"
 
-            PKG_SECTION="## ${name}"$'\n'
-            HAS_CONTENT=false
+            package_section="### ${name}\n"
+            has_content=false
 
-            for category_label in \
-              "🚀 Features|$FEATS" \
-              "🐛 Bug Fixes|$FIXES" \
-              "🧹 Chores|$CHORES" \
-              "📖 Documentation|$DOCS" \
-              "♻️ Refactors|$REFACTORS" \
-              "⚡ Performance|$PERFS" \
-              "🧪 Tests|$TESTS" \
-              "📦 Other Changes|$OTHERS"; do
-              IFS='|' read -r label content <<< "$category_label"
+            for category in \
+              "Features|$features" \
+              "Bug Fixes|$fixes" \
+              "Chores|$chores" \
+              "Documentation|$docs" \
+              "Refactors|$refactors" \
+              "Performance|$performance" \
+              "Tests|$tests" \
+              "Other Changes|$others"; do
+              IFS='|' read -r label content <<< "$category"
               if [ -n "$content" ]; then
-                PKG_SECTION+=$'\n'"### ${label}"$'\n'"${content}"$'\n'
-                HAS_CONTENT=true
+                package_section+="\n#### ${label}\n${content}\n"
+                has_content=true
               fi
             done
 
-            if [ "$HAS_CONTENT" = true ]; then
-              CHANGELOG+=$'\n'"${PKG_SECTION}"$'\n'
+            if [ "$has_content" = true ]; then
+              changelog+="\n${package_section}\n"
             fi
           done
 
-          if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="No package changes detected since the last release."
+          if [ "$changelog" = "## $RELEASE_TAG\n\nPublished under the npm \`$NPM_TAG\` tag in \`$RELEASE_MODE\` mode.\n" ]; then
+            changelog+="\nNo package changes detected since the last stable release.\n"
           fi
 
-          # Write to file to avoid shell escaping issues
-          echo "$CHANGELOG" > /tmp/changelog.md
+          printf '%b' "$changelog" > /tmp/changelog.md
 
-      - name: Create GitHub draft release
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: v${{ github.event.inputs.version }}
+          tag_name: ${{ steps.release.outputs.release_tag }}
+          name: ${{ steps.release.outputs.release_name }}
           body_path: /tmp/changelog.md
-          draft: true
+          prerelease: ${{ steps.release.outputs.prerelease }}
+          draft: false
           generate_release_notes: false
