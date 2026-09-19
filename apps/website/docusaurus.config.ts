@@ -56,7 +56,7 @@ const config: Config = {
             [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
           ],
           editUrl:
-            'https://github.com/neplextech/commandkit/tree/main/apps/website/',
+            'https://github.com/neplexlabs/commandkit/tree/main/apps/website/',
           sidebarItemsGenerator: async (args) => {
             const items = await args.defaultSidebarItemsGenerator(args);
 
@@ -148,7 +148,7 @@ const config: Config = {
           },
         },
         {
-          href: 'https://github.com/neplextech/commandkit',
+          href: 'https://github.com/neplexlabs/commandkit',
           label: 'GitHub',
           position: 'right',
         },

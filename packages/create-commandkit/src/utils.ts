@@ -63,7 +63,7 @@ export function isOfficialExample(example: string): boolean {
       const url = new URL(example);
       return (
         url.hostname === 'github.com' &&
-        url.pathname.startsWith('/neplextech/commandkit')
+        url.pathname.startsWith('/neplexlabs/commandkit')
       );
     } catch {
       return false;
@@ -95,7 +95,7 @@ export function getInstallCommand(
 export async function fetchAvailableExamples(): Promise<string[]> {
   try {
     const response = await fetch(
-      'https://api.github.com/repos/neplextech/commandkit/contents/examples',
+      'https://api.github.com/repos/neplexlabs/commandkit/contents/examples',
       {
         signal: AbortSignal.timeout(10_000),
         headers: {

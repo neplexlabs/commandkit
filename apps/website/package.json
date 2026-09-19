@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/neplextech/commandkit",
+    "url": "https://github.com/neplexlabs/commandkit",
     "directory": "apps/website"
   },
   "dependencies": {

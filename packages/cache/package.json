@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neplextech/commandkit.git",
+    "url": "git+https://github.com/neplexlabs/commandkit.git",
     "directory": "packages/cache"
   },
   "keywords": [
@@ -43,7 +43,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/neplextech/commandkit/issues"
+    "url": "https://github.com/neplexlabs/commandkit/issues"
   },
   "homepage": "https://commandkit.dev",
   "devDependencies": {

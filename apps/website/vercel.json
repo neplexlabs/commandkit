@@ -8,7 +8,7 @@
     },
     {
       "source": "/github",
-      "destination": "https://github.com/neplextech/commandkit",
+      "destination": "https://github.com/neplexlabs/commandkit",
       "permanent": true
     }
   ]

@@ -1,10 +1,10 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/neplextech/commandkit/main/apps/website/static/img/ckit_logo.svg" width="60%" />
+    <img src="https://raw.githubusercontent.com/neplexlabs/commandkit/main/apps/website/static/img/ckit_logo.svg" width="60%" />
     <br />
     <a href="https://commandkit.dev/discord"><img src="https://img.shields.io/discord/1055188344188973066?color=5865F2&logo=discord&logoColor=white" alt="support server" /></a>
     <a href="https://www.npmjs.com/package/commandkit"><img src="https://img.shields.io/npm/v/commandkit?maxAge=3600" alt="npm version" /></a>
     <a href="https://www.npmjs.com/package/commandkit"><img src="https://img.shields.io/npm/dt/commandkit?maxAge=3600" alt="npm downloads" /></a>
-    <a href="https://deepwiki.com/neplextech/commandkit"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
+    <a href="https://deepwiki.com/neplexlabs/commandkit"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" /></a>
 </div>
 
 <p align="center">The discord.js meta-framework for building powerful, modular, and extensible Discord bots with ease.</p>
@@ -15,7 +15,7 @@ If you are looking for support or want to provide suggestions, check out the [Di
 
 ## Links
 
-- [Website](https://commandkit.dev) ([source](https://github.com/neplextech/commandkit/tree/main/apps/website))
+- [Website](https://commandkit.dev) ([source](https://github.com/neplexlabs/commandkit/tree/main/apps/website))
 - [npm](https://www.npmjs.com/package/commandkit)
 
 ## Packages
@@ -32,4 +32,4 @@ If you are looking for support or want to provide suggestions, check out the [Di
 
 ## Contributing
 
-Check out the [contributors guide](https://github.com/neplextech/commandkit/blob/main/CONTRIBUTING.md)
+Check out the [contributors guide](https://github.com/neplexlabs/commandkit/blob/main/CONTRIBUTING.md)

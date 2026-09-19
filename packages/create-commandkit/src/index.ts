@@ -267,7 +267,7 @@ To start your bot${projectDir !== '.' ? `, ${colors.magenta(`cd ${projectDir}`)}
   ${colors.magenta(command('start'))}   - Run your bot in production mode
 
 • Documentation: ${colors.blue('https://commandkit.dev')}
-• GitHub: ${colors.blue('https://github.com/neplextech/commandkit')}
+• GitHub: ${colors.blue('https://github.com/neplexlabs/commandkit')}
 • Neplex: ${colors.blue('https://neplextech.com')}
 • Discord community: ${colors.blue('https://commandkit.dev/discord')}
 

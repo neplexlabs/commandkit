@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/neplextech/commandkit/main/apps/website/static/img/ckit_logo.svg" width="60%" />
+    <img src="https://raw.githubusercontent.com/neplexlabs/commandkit/main/apps/website/static/img/ckit_logo.svg" width="60%" />
     <br />
     <a href="https://commandkit.dev/discord"><img src="https://img.shields.io/discord/1055188344188973066?color=5865F2&logo=discord&logoColor=white" alt="support server" /></a>
     <a href="https://www.npmjs.com/package/create-commandkit"><img src="https://img.shields.io/npm/v/create-commandkit?maxAge=3600" alt="npm version" /></a>
@@ -68,13 +68,13 @@ npx create-commandkit@latest --example "https://github.com/user/repo" --example-
 ### Available Examples
 
 <!-- BEGIN_AVAILABLE_EXAMPLES -->
-- `basic-js` - [examples/basic-js](https://github.com/neplextech/commandkit/tree/main/examples/basic-js)
-- `basic-ts` - [examples/basic-ts](https://github.com/neplextech/commandkit/tree/main/examples/basic-ts)
-- `deno-ts` - [examples/deno-ts](https://github.com/neplextech/commandkit/tree/main/examples/deno-ts)
-- `with-ai` - [examples/with-ai](https://github.com/neplextech/commandkit/tree/main/examples/with-ai)
-- `with-leveling-system` - [examples/with-leveling-system](https://github.com/neplextech/commandkit/tree/main/examples/with-leveling-system)
-- `with-workflow` - [examples/with-workflow](https://github.com/neplextech/commandkit/tree/main/examples/with-workflow)
-- `without-cli` - [examples/without-cli](https://github.com/neplextech/commandkit/tree/main/examples/without-cli)
+- `basic-js` - [examples/basic-js](https://github.com/neplexlabs/commandkit/tree/main/examples/basic-js)
+- `basic-ts` - [examples/basic-ts](https://github.com/neplexlabs/commandkit/tree/main/examples/basic-ts)
+- `deno-ts` - [examples/deno-ts](https://github.com/neplexlabs/commandkit/tree/main/examples/deno-ts)
+- `with-ai` - [examples/with-ai](https://github.com/neplexlabs/commandkit/tree/main/examples/with-ai)
+- `with-leveling-system` - [examples/with-leveling-system](https://github.com/neplexlabs/commandkit/tree/main/examples/with-leveling-system)
+- `with-workflow` - [examples/with-workflow](https://github.com/neplexlabs/commandkit/tree/main/examples/with-workflow)
+- `without-cli` - [examples/without-cli](https://github.com/neplexlabs/commandkit/tree/main/examples/without-cli)
 <!-- END_AVAILABLE_EXAMPLES -->
 
 ### Examples

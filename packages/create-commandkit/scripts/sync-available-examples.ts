@@ -15,7 +15,7 @@ function insertBetween(content: string) {
   const examples = availableExamples
     .map(
       (example) =>
-        `- \`${example}\` - [examples/${example}](https://github.com/neplextech/commandkit/tree/main/examples/${example})`,
+        `- \`${example}\` - [examples/${example}](https://github.com/neplexlabs/commandkit/tree/main/examples/${example})`,
     )
     .join('\n');
 

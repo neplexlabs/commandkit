@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/neplextech/commandkit"
+    "url": "https://github.com/neplexlabs/commandkit"
   },
   "devDependencies": {
     "@types/node": "^25.9.5",
