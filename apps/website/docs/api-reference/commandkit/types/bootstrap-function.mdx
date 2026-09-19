@@ -18,6 +18,5 @@ import MemberDescription from '@site/src/components/MemberDescription';
 Represents the function executed during the bootstrap phase of CommandKit.
 
 ```ts title="Signature"
-type BootstrapFunction = | GenericFunction<[CommandKit]>
-  | AsyncFunction<[CommandKit]>
+type BootstrapFunction = GenericFunction<[CommandKit]> | AsyncFunction<[CommandKit]>
 ```

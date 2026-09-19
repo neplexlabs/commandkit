@@ -18,7 +18,5 @@ import MemberDescription from '@site/src/components/MemberDescription';
 Represents a localization module that can be used with the i18next plugin.
 
 ```ts title="Signature"
-type LocalizationModule = | NewableModule<Module>
-  | Module
-  | Newable<Module>
+type LocalizationModule = NewableModule<Module> | Module | Newable<Module>
 ```

@@ -24,6 +24,7 @@ interface LoadedEvent {
     event: ParsedEvent;
     listeners: EventListener[];
     mainListener?: EventListener;
+    onceListener?: EventListener;
     executedOnceListeners?: Set<ListenerFunction>;
 }
 ```
@@ -51,6 +52,11 @@ interface LoadedEvent {
 
 
 ### mainListener
+
+<MemberInfo kind="property" type={`<a href='/docs/api-reference/commandkit/types/event-listener#eventlistener'>EventListener</a>`}   />
+
+
+### onceListener
 
 <MemberInfo kind="property" type={`<a href='/docs/api-reference/commandkit/types/event-listener#eventlistener'>EventListener</a>`}   />
 

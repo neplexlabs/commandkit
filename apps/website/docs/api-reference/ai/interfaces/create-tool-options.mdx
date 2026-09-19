@@ -18,10 +18,11 @@ import MemberDescription from '@site/src/components/MemberDescription';
 Configuration options for creating an AI tool.
 
 ```ts title="Signature"
-interface CreateToolOptions<T extends ToolParameterType, R = unknown> {
+interface CreateToolOptions<T extends ToolParameterType, R = unknown, C extends JSONSchema7 = JSONSchema7> {
     name: string;
     description: string;
     inputSchema: T;
+    contextSchema?: C;
     execute: ToolExecuteFunction<T, R>;
 }
 ```
@@ -43,6 +44,11 @@ A human-readable description of what the tool does
 <MemberInfo kind="property" type={`T`}   />
 
 The parameter schema that defines the tool's input structure
+### contextSchema
+
+<MemberInfo kind="property" type={`C`}   />
+
+The context schema for this tool
 ### execute
 
 <MemberInfo kind="property" type={`<a href='/docs/api-reference/ai/types/tool-execute-function#toolexecutefunction'>ToolExecuteFunction</a>&#60;T, R&#62;`}   />

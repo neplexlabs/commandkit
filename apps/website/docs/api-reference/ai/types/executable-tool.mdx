@@ -1,5 +1,5 @@
 ---
-title: "EventsTree"
+title: "ExecutableTool"
 isDefaultIndex: false
 generated: true
 ---
@@ -11,12 +11,14 @@ import MemberDescription from '@site/src/components/MemberDescription';
 <!-- This file was generated from the CommandKit source. Do not modify. Instead, re-run the "docgen" script -->
 
 
-## EventsTree
+## ExecutableTool
 
-<GenerationInfo sourceFile="packages/commandkit/src/app/router/EventsRouter.ts" sourceLine="34" packageName="commandkit" />
+<GenerationInfo sourceFile="packages/ai/src/tools/common/index.ts" sourceLine="57" packageName="@commandkit/ai" />
 
-Collection of event names to their parsed metadata
+
 
 ```ts title="Signature"
-type EventsTree = Record<string, ParsedEvent>
+type ExecutableTool<T, R, C extends Context> = ReturnType<
+  typeof tool<T, R, C>
+>
 ```

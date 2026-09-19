@@ -13,7 +13,7 @@ import MemberDescription from '@site/src/components/MemberDescription';
 
 ## createTool
 
-<GenerationInfo sourceFile="packages/ai/src/tools/common/index.ts" sourceLine="90" packageName="@commandkit/ai" />
+<GenerationInfo sourceFile="packages/ai/src/tools/common/index.ts" sourceLine="102" packageName="@commandkit/ai" />
 
 Creates a new AI tool with the specified configuration.
 This function wraps the underlying AI library's tool creation with additional
@@ -41,11 +41,11 @@ const myTool = createTool({
 ```
 
 ```ts title="Signature"
-function createTool<T extends ToolParameterType, R = unknown>(options: CreateToolOptions<T, R>): void
+function createTool<T extends ToolParameterType, R = unknown, C extends Context = Context>(options: CreateToolOptions<T, R, C>): ExecutableTool<T, R, C>
 ```
 Parameters
 
 ### options
 
-<MemberInfo kind="parameter" type={`<a href='/docs/api-reference/ai/interfaces/create-tool-options#createtooloptions'>CreateToolOptions</a>&#60;T, R&#62;`} />
+<MemberInfo kind="parameter" type={`<a href='/docs/api-reference/ai/interfaces/create-tool-options#createtooloptions'>CreateToolOptions</a>&#60;T, R, C&#62;`} />
 
