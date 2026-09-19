@@ -35,6 +35,6 @@
     "discord.js": "catalog:discordjs",
     "tsconfig": "workspace:*",
     "typescript": "catalog:build",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }

@@ -184,12 +184,12 @@
   },
   "devDependencies": {
     "@types/ms": "^2.1.0",
-    "@types/node": "^25.3.2",
+    "@types/node": "^25.9.5",
     "discord.js": "catalog:discordjs",
     "tsconfig": "workspace:*",
     "tsx": "^4.23.1",
     "typescript": "catalog:build",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=24"

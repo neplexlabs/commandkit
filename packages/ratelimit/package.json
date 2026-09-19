@@ -56,10 +56,10 @@
   "devDependencies": {
     "@types/ms": "^2.1.0",
     "commandkit": "workspace:*",
-    "discord.js": "catalog:discordjs",
     "directive-to-hof": "^0.0.3",
+    "discord.js": "catalog:discordjs",
     "tsconfig": "workspace:*",
     "typescript": "catalog:build",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
