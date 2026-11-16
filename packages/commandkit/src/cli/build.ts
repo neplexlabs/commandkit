@@ -16,6 +16,7 @@ import { mergeDeep } from '../config/utils';
 import { CompilerPlugin, CompilerPluginRuntime } from '../plugins';
 import { COMMANDKIT_CWD } from '../utils/constants';
 import { version } from '../version';
+import { createBuildPlugins } from './build-plugins';
 import { copyLocaleFiles, loadTsdown } from './common';
 import { devEnvFileArgs, prodEnvFileArgs } from './env';
 import { performTypeCheck } from './type-checker';
@@ -84,9 +85,11 @@ export async function buildApplication({
     !!isDev,
   );
 
-  rolldownPlugins ??= [];
-
-  rolldownPlugins.push(pluginRuntime.toJSON());
+  // Create a fresh adapter list on each rebuild instead of modifying cached config.
+  const buildPlugins = createBuildPlugins(
+    rolldownPlugins,
+    pluginRuntime.toJSON(),
+  );
 
   try {
     const dest = isDev ? '.commandkit' : config.distDir;
@@ -137,7 +140,7 @@ export async function buildApplication({
               js: context.format === 'cjs' ? '.cjs' : '.js',
             };
           },
-          plugins: rolldownPlugins,
+          plugins: buildPlugins,
           platform: 'node',
           deps: {
             neverBundle: true,
