@@ -84,9 +84,9 @@ export async function buildApplication({
     !!isDev,
   );
 
-  rolldownPlugins ??= [];
-
-  rolldownPlugins.push(pluginRuntime.toJSON());
+  // Do not mutate the plugins array from the cached CommandKit configuration.
+  // Reusing it would accumulate a compiler adapter on every dev rebuild.
+  const buildPlugins = [...(rolldownPlugins ?? []), pluginRuntime.toJSON()];
 
   try {
     const dest = isDev ? '.commandkit' : config.distDir;
@@ -137,7 +137,7 @@ export async function buildApplication({
               js: context.format === 'cjs' ? '.cjs' : '.js',
             };
           },
-          plugins: rolldownPlugins,
+          plugins: buildPlugins,
           platform: 'node',
           deps: {
             neverBundle: true,
