@@ -86,7 +86,10 @@ export async function buildApplication({
   );
 
   // Create a fresh adapter list on each rebuild instead of modifying cached config.
-  const buildPlugins = createBuildPlugins(rolldownPlugins, pluginRuntime.toJSON());
+  const buildPlugins = createBuildPlugins(
+    rolldownPlugins,
+    pluginRuntime.toJSON(),
+  );
 
   try {
     const dest = isDev ? '.commandkit' : config.distDir;
