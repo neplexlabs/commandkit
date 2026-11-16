@@ -16,6 +16,7 @@ import { mergeDeep } from '../config/utils';
 import { CompilerPlugin, CompilerPluginRuntime } from '../plugins';
 import { COMMANDKIT_CWD } from '../utils/constants';
 import { version } from '../version';
+import { createBuildPlugins } from './build-plugins';
 import { copyLocaleFiles, loadTsdown } from './common';
 import { devEnvFileArgs, prodEnvFileArgs } from './env';
 import { performTypeCheck } from './type-checker';
@@ -84,9 +85,8 @@ export async function buildApplication({
     !!isDev,
   );
 
-  // Do not mutate the plugins array from the cached CommandKit configuration.
-  // Reusing it would accumulate a compiler adapter on every dev rebuild.
-  const buildPlugins = [...(rolldownPlugins ?? []), pluginRuntime.toJSON()];
+  // Create a fresh adapter list on each rebuild instead of modifying cached config.
+  const buildPlugins = createBuildPlugins(rolldownPlugins, pluginRuntime.toJSON());
 
   try {
     const dest = isDev ? '.commandkit' : config.distDir;
